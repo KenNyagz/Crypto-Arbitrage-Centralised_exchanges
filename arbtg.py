@@ -14,5 +14,20 @@ for i in huobi_tickers:
     if i in binance_tickers:
         common_tickers.update({i: huobi_tickers[i]})
 
+print("Common tokens in binance and gateio are", len(common_tickers), "\n") # ~320
 for i in common_tickers:
-    print(i) # ~320
+    if huobi_tickers[i] > binance_tickers[i]:
+        difference = huobi_tickers[i] - binance_tickers[i]
+        percentage_to_binance = difference / binance_tickers[i] * 100
+        percentage_to_huobi = (difference / huobi_tickers[i]) * 100
+        if percentage_to_huobi > 3:
+            print(i, end=": ")
+            print("difference is", percentage_to_huobi, "% favouring huobi")
+    elif binance_tickers[i] > huobi_tickers[i]:
+        difference = binance_tickers[i] - huobi_tickers[i]
+        percentage_to_binance = difference / binance_tickers[i] * 100
+        percentage_to_huobi = (difference / huobi_tickers[i]) * 100
+        if percentage_to_binance > 3:
+            print(i, end=": ")
+            print("difference is", percentage_to_huobi, "% favouring binance")
+

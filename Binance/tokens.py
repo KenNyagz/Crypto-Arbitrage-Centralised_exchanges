@@ -20,7 +20,7 @@ def get_tokens(binance_secret=None):
         for key in i:
             pair = i['symbol']
             price = i['price']
-            pairs_list.update({pair: price})
+            pairs_list.update({pair: float(price)})
 
     #for pair in pairs_list:
     #    print(pair,':', pairs_list[pair])
