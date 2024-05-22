@@ -1,7 +1,7 @@
 from binance import Client
 
 
-def get_tokens(binance_secret=None):
+def get_tickers(binance_secret=None):
     if binance_secret is None:
         with open("api_secret", 'r') as f:
             secret = f.read()
@@ -28,4 +28,4 @@ def get_tokens(binance_secret=None):
 
 
 if __name__ == "__main__":
-    get_tokens()
+    get_tickers()
