@@ -2,6 +2,7 @@ from binance import Client
 from Binance.get_tickers import get_tickers as binance_tickers_
 from Huobi.get_tickers import get_tickers as huobi_tickers_
 from OKX.get_tickers import get_tickers as okx_tickers
+from GateIO.get_tickers import get_tickers as gateio_tickers
 
 def get_secret(file_name):
     if not isinstance(file_name, str):
@@ -10,11 +11,16 @@ def get_secret(file_name):
         exchange_secret = f.read()
     return exchange_secret
 
+# getting the secret keys
 binance_secret = get_secret("Binance/api_secret")
 okx_secret = get_secret("OKX/api_secret")
+
+# Getting all ticker symbols and their prices from exchanges
 binance_tickers = binance_tickers_(binance_secret)
-huobi_tickers = huobi_tickers_()
+huobi_tickers = huobi_tickers_() #
 okx_tickers = okx_tickers(okx_secret)
+gateio_tickers = gateio_tickers("test") #
+
 
 def get_arbtg(exchange1, exchange2, exchange1_tickers, exchange2_tickers):
     common_tickers = {}
@@ -22,7 +28,7 @@ def get_arbtg(exchange1, exchange2, exchange1_tickers, exchange2_tickers):
         if i in exchange2_tickers:
             common_tickers.update({i: exchange1_tickers[i]})
 
-    print("\nCommon tokens in binance and okx are", len(common_tickers), "\n")
+    print(f"\nCommon tokens in {exchange1} and {exchange2} are", len(common_tickers), "\n")
     percentage_diffs = {f"percentage_to_{exchange1}": 0.0, f"percentage_to_{exchange1}": 0.0}
     for i in common_tickers:
         if exchange1_tickers[i] > exchange2_tickers[i]:
@@ -40,4 +46,8 @@ def get_arbtg(exchange1, exchange2, exchange1_tickers, exchange2_tickers):
                 print(i, end=": ")
                 print("difference is", percentage_diffs[f"percentage_to_{exchange2}"], f"% favouring {exchange2}")
 
-get_arbtg('okx', 'binance', okx_tickers, binance_tickers)
+
+#print('\n OkX and Binance\n', get_arbtg('okx', 'binance', okx_tickers, binance_tickers))
+#print('\n Huobi and Binance\n', get_arbtg('huobi', 'binance', huobi_tickers, binance_tickers))
+#print('\n OkX and Huobi\n', get_arbtg('okx', 'huobi', okx_tickers, huobi_tickers))
+get_arbtg('binance', 'gateio', binance_tickers, gateio_tickers)

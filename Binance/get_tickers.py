@@ -10,6 +10,7 @@ def get_tickers(binance_secret=None):
 
     pub = "xab1YQKg42rWQviBVcViQinX6fkYd7hVM6hndxUsWT4Q3xRXP0XeEhmdJnGVMbrV"
     client = Client(pub, secret)
+    #https://api.binance.com/api/v3/ticker/bookTicker - An alternative way which we can use requests module
 
     tickers = client.get_all_tickers()
     #for ticker in tickers:

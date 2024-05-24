@@ -9,17 +9,16 @@ def get_tickers(okx_secret=None):
         secret = okx_secret
     public_key = '6114f3f9-1c11-47b4-ba6a-7bf5dca15972'    
 
-    url = 'https://www.okx.com/api/v5/market/tickers?instType=SPOT'
+    url = 'https://api.gateio.ws/api/v4/spot/tickers'
     response = requests.get(url)
     data = response.json()
 
     pairs_prices = {}
-    for i in data['data']:
-        for key in i:
-            pair = i['instId']
-            pair = pair.replace('-', '') # remove dash separating coins in pair
-            price = i['last']
-            pairs_prices.update({pair: float(price)})
+    for i in data:
+        pair = i['currency_pair']
+        pair = pair.replace('_', '') # remove dash separating coins in pair
+        price = i['last']
+        pairs_prices.update({pair: float(price)})
 
     #for pair in pairs_prices:
     #    print(pair, ':', pairs_prices[pair]) # visualisation
