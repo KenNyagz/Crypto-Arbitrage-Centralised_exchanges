@@ -35,9 +35,6 @@ def get_arbtg(exchange1, exchange2, exchange1_tickers, exchange2_tickers):
     for i in common_tickers:
         if exchange1_tickers[i] > exchange2_tickers[i]:
             difference = exchange1_tickers[i] - exchange2_tickers[i]
-            print(exchange1_tickers[i], exchange2_tickers[i], difference)
-            break
-            difference = exchange1_tickers[i] - exchange2_tickers[i]
 
             try:
                 percentage_diffs[f"percentage_to_{exchange1}"] = difference / exchange2_tickers[i] * 100
@@ -69,5 +66,5 @@ def get_arbtg(exchange1, exchange2, exchange1_tickers, exchange2_tickers):
 #print('\n OkX and Binance\n', get_arbtg('okx', 'binance', okx_tickers, binance_tickers))
 print('\n Huobi and Binance\n', get_arbtg('huobi', 'binance', huobi_tickers, binance_tickers))
 #print('\n OkX and Huobi\n', get_arbtg('okx', 'huobi', okx_tickers, huobi_tickers))
-#get_arbtg('binance', 'gateio', binance_tickers, gateio_tickers)
+#print('\n binance and gateio\n',get_arbtg('binance', 'gateio', binance_tickers, gateio_tickers)
 
