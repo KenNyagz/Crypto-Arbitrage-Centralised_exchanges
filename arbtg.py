@@ -28,7 +28,8 @@ def get_arbtg(exchange1, exchange2, exchange1_tickers, exchange2_tickers):
         if i in exchange2_tickers:
             common_tickers.update({i: exchange1_tickers[i]})
 
-    print(f"\nCommon tickers in {exchange1} and {exchange2} are", len(common_tickers), "\n")
+    result = f"\nCommon tickers in {exchange1} and {exchange2} are", len(common_tickers), "\n"
+    print(result)
 
     percentage_diffs = {f"percentage_to_{exchange1}": 0.0, f"percentage_to_{exchange1}": 0.0}
     for i in common_tickers:
@@ -47,6 +48,7 @@ def get_arbtg(exchange1, exchange2, exchange1_tickers, exchange2_tickers):
             if percentage_diffs[f"percentage_to_{exchange1}"] > 3:
                 print(i, end=": ")
                 print("difference is", percentage_diffs[f"percentage_to_{exchange1}"], f"% favouring {exchange1}")
+                result += f"{i}: difference is {percentage_diffs[f'percentage_to_{exchange1}']}% favouring {exchange1}\n" # for contructing return value
 
         elif exchange2_tickers[i] > exchange1_tickers[i]:
             difference = exchange2_tickers[i] - exchange2_tickers[i]
@@ -60,7 +62,9 @@ def get_arbtg(exchange1, exchange2, exchange1_tickers, exchange2_tickers):
                 print(i, end=": ")
                 print(f" {exchange1_tickers[i]} <-> {exchange2}")
                 print("difference is", percentage_diffs[f"percentage_to_{exchange2}"], f"% favouring {exchange2}")
+                result += f"{i}: difference is {percentage_diffs[f'percentage_to_{exchange1}']}% favouring {exchange1}\n" #Constructing return value
 
+    return result
 
 #print('\n OkX and Binance\n', get_arbtg('okx', 'binance', okx_tickers, binance_tickers))
 print('\n Huobi and Binance\n', get_arbtg('huobi', 'binance', huobi_tickers, binance_tickers))
