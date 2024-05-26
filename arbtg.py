@@ -40,7 +40,7 @@ def get_arbtg(exchange1, exchange2, exchange1_tickers, exchange2_tickers):
                 percentage_diffs[f"percentage_to_{exchange1}"] = difference / exchange1_tickers[ticker] * 100
                 percentage_diffs[f"percentage_to_{exchange2}"] = (difference / exchange2_tickers[ticker]) * 100
             except ZeroDivisionError as e:
-                 print(f"ERROR: {exchange1_tickers[ticker]} - {exchange2_tickers[ticker]}")
+                 print(f"ERROR:{ticker}- {exchange1_tickers[ticker]} - {exchange2_tickers[ticker]}")
                  continue
 
             if percentage_diffs[f"percentage_to_{exchange1}"] > 3:
@@ -54,7 +54,7 @@ def get_arbtg(exchange1, exchange2, exchange1_tickers, exchange2_tickers):
                 percentage_diffs[f"percentage_to_{exchange2}"] = difference / exchange2_tickers[ticker] * 100
                 percentage_diffs[f"percentage_to_{exchange1}"] = (difference / exchange1_tickers[ticker]) * 100
             except ZeroDivisionError as e:
-                 print(f"ERROR: price1:{exchange1_tickers[ticker]} - price2:{exchange2_tickers[ticker]}")
+                 print(f"ERROR`:{ticker}- {exchange1_tickers[ticker]} - {exchange2_tickers[ticker]}")
                  continue
 
             if percentage_diffs[f"percentage_to_{exchange2}"] > 3:
@@ -66,5 +66,5 @@ def get_arbtg(exchange1, exchange2, exchange1_tickers, exchange2_tickers):
 
 #print('\n OkX and Binance\n', get_arbtg('okx', 'binance', okx_tickers, binance_tickers))
 #print('\n Huobi and Binance\n', get_arbtg('huobi', 'binance', huobi_tickers, binance_tickers))
-#print('\n OkX and Huobi\n', get_arbtg('okx', 'huobi', okx_tickers, huobi_tickers))
-print('\n binance and gateio\n',get_arbtg('binance', 'gateio', binance_tickers, gateio_tickers))
+print('\n OkX and Huobi\n', get_arbtg('okx', 'huobi', okx_tickers, huobi_tickers))
+#print('\n binance and gateio\n',get_arbtg('binance', 'gateio', binance_tickers, gateio_tickers))

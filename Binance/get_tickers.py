@@ -14,8 +14,6 @@ def get_tickers(binance_secret=None):
                                                        #can use requests module
 
     tickers = client.get_all_tickers()
-    #for ticker in tickers:
-    #    print(ticker)
     pairs_list = {}
 
     for i in tickers:
