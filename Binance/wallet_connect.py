@@ -36,12 +36,6 @@ def wallet_connect(exchange_key, exchange_secret):
 			bals.append(balance)
  			#print(f"{balance['asset']} : {balance['free']}")
 
-	withdrawal = client.withdraw(
-				asset='BNB',
-				address='',
-				amount='0.001',
-				network='BEP20')
-	
 	return bals
 	
 
