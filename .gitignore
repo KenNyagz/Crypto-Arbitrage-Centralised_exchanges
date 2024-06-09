@@ -71,6 +71,9 @@ instance/
 # Sphinx documentation
 docs/_build/
 
+#secret_keys
+*secret*
+
 # PyBuilder
 .pybuilder/
 target/
