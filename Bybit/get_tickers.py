@@ -20,7 +20,7 @@ def get_tickers(okx_secret=None):
             price = i['lastPrice']
             pairs_prices[pair] = float(price)
 
-    ##print(len(pairs_prices))
+    #print(len(pairs_prices))
     #for pair in pairs_prices:
     #    print(pair, ':', pairs_prices[pair]) # visualisation
     return pairs_prices
