@@ -30,7 +30,7 @@ def get_arbtg(exchange1, exchange2, exchange1_tickers, exchange2_tickers):
             common_tickers[ticker] = exchange1_tickers[ticker]
 
     result = f"\nCommon tickers in {exchange1} and {exchange2} are: {len(common_tickers)}\n"
-    print(result)
+    #print(result)
 
     percentage_diffs = {f"percentage_to_{exchange1}": 0.0, f"percentage_to_{exchange2}": 0.0}
     for ticker in common_tickers:
@@ -41,13 +41,15 @@ def get_arbtg(exchange1, exchange2, exchange1_tickers, exchange2_tickers):
                 percentage_diffs[f"percentage_to_{exchange1}"] = difference / exchange1_tickers[ticker] * 100
                 percentage_diffs[f"percentage_to_{exchange2}"] = (difference / exchange2_tickers[ticker]) * 100
             except ZeroDivisionError as e:
-                 print(f"ERROR:{ticker}- {exchange1_tickers[ticker]} - {exchange2_tickers[ticker]}")
+                 print(f"zeroDivERROR:{ticker} : {exchange1_tickers[ticker]} ~ {exchange2_tickers[ticker]}")
                  continue
 
             if percentage_diffs[f"percentage_to_{exchange1}"] > 3:
-                print(ticker, end=": ")
-                print(percentage_diffs[f"percentage_to_{exchange1}"], f"% favouring {exchange1}")
-                #result += f"{ticker}: difference is {percentage_diffs[f'percentage_to_{exchange1}']}% favouring {exchange1}\n" # for contructing return value
+                #print(ticker, end=" : ")
+                # #print(percentage_diffs[f"percentage_to_{exchange1}"], f"% favouring {exchange1}") ## Don't uncomment unless testing
+                #print(percentage_diffs[f"percentage_to_{exchange2}"], f"% favouring {exchange2}")
+                # #result += f"{ticker} : difference is {percentage_diffs[f'percentage_to_{exchange1}']}% favouring {exchange1}\n" ## Don't uncomment unless testing
+                result += f"{ticker} : difference is {percentage_diffs[f'percentage_to_{exchange2}']}% favouring {exchange2}\n" # return value construct
 
         elif exchange2_tickers[ticker] > exchange1_tickers[ticker]:
             difference = exchange2_tickers[ticker] - exchange1_tickers[ticker]
@@ -55,17 +57,19 @@ def get_arbtg(exchange1, exchange2, exchange1_tickers, exchange2_tickers):
                 percentage_diffs[f"percentage_to_{exchange2}"] = difference / exchange2_tickers[ticker] * 100
                 percentage_diffs[f"percentage_to_{exchange1}"] = (difference / exchange1_tickers[ticker]) * 100
             except ZeroDivisionError as e:
-                 print(f"ERROR`:{ticker}- {exchange1_tickers[ticker]} - {exchange2_tickers[ticker]}")
+                 print(f"zeroDivERROR:{ticker} : {exchange1_tickers[ticker]} ~ {exchange2_tickers[ticker]}")
                  continue
 
             if percentage_diffs[f"percentage_to_{exchange2}"] > 3:
-                print(ticker, end=": ")
-                print(percentage_diffs[f"percentage_to_{exchange2}"], f"% favouring {exchange2}")
-                #result += f"{ticker}: difference is {percentage_diffs[f'percentage_to_{exchange1}']}% favouring {exchange1}\n" #Constructing return value
+                #print(ticker, end=" : ")
+                # #print(percentage_diffs[f"percentage_to_{exchange2}"], f"% favouring {exchange2}") ## Don't uncomment unless testing
+                #print(percentage_diffs[f"percentage_to_{exchange1}"], f"% favouring {exchange1}")
+                # #result += f"{ticker} : difference is {percentage_diffs[f'percentage_to_{exchange2}']}% favouring {exchange2}\n" ## Don't uncomment unless testing
+                result += f"{ticker} : difference is {percentage_diffs[f'percentage_to_{exchange1}']}% favouring {exchange1}\n" #Constructing return value
 
-    #return result
+    return result
 
 #print('\n OkX and Binance\n', get_arbtg('okx', 'binance', okx_tickers, binance_tickers))
 #print('\n Huobi and Binance\n', get_arbtg('huobi', 'binance', huobi_tickers, binance_tickers))
-print('\n OkX and Huobi\n', get_arbtg('okx', 'huobi', okx_tickers, huobi_tickers))
-#print('\n binance and gateio\n',get_arbtg('binance', 'gateio', binance_tickers, gateio_tickers))
+#print('OkX and Huobi\n', get_arbtg('okx', 'huobi', okx_tickers, huobi_tickers))
+print('\n binance and gateio\n',get_arbtg('binance', 'gateio', binance_tickers, gateio_tickers))
