@@ -1,4 +1,4 @@
-'''
+
 with open("Binance/api_secret", 'r') as f:
     binance_secret = f.read()
 with open("OKX/api_secret", 'r') as f:
@@ -28,7 +28,7 @@ for i in common_tickers_BxH:
         if percentage_to_binance > 3:
             print(i, end=": ")
 #            print("difference is", percentage_to_binance, "% favouring binance")
-'''
+
 '=========================================================================='
 
 from binance import Client
