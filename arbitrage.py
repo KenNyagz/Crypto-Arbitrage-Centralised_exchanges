@@ -1,36 +1,4 @@
-'''
-with open("Binance/api_secret", 'r') as f:
-    binance_secret = f.read()
-with open("OKX/api_secret", 'r') as f:
-    okx_secret = f.read()
-
-
-## Huobi x Binance
-common_tickers_BxH = {}
-for i in huobi_tickers:
-    if i in binance_tickers:
-        common_tickers_BxH.update({i: huobi_tickers[i]})
-
-print("\nCommon tokens in binance and huobi are", len(common_tickers_BxH), "\n")
-
-for i in common_tickers_BxH:
-    if huobi_tickers[i] > binance_tickers[i]:
-        difference = huobi_tickers[i] - binance_tickers[i]
-        percentage_to_binance = difference / binance_tickers[i] * 100
-        percentage_to_huobi = (difference / huobi_tickers[i]) * 100
-        if percentage_to_huobi > 3:
-            print(i, end=": ")
-#            print("difference is", percentage_to_huobi, "% favouring huobi")
-    elif binance_tickers[i] > huobi_tickers[i]:
-        difference = binance_tickers[i] - huobi_tickers[i]
-        percentage_to_binance = difference / binance_tickers[i] * 100
-        percentage_to_huobi = (difference / huobi_tickers[i]) * 100
-        if percentage_to_binance > 3:
-            print(i, end=": ")
-#            print("difference is", percentage_to_binance, "% favouring binance")
-'''
-'=========================================================================='
-
+#!/usr/bin/python3
 from binance import Client
 from Binance.get_tickers import get_tickers as binance_tickers_
 from Huobi.get_tickers import get_tickers as huobi_tickers_
@@ -73,7 +41,7 @@ def get_arbtg(exchange1, exchange2, exchange1_tickers, exchange2_tickers):
                 percentage_diffs[f"percentage_to_{exchange1}"] = difference / exchange1_tickers[ticker] * 100
                 percentage_diffs[f"percentage_to_{exchange2}"] = (difference / exchange2_tickers[ticker]) * 100
             except ZeroDivisionError as e:
-                 print(f"ERROR: {exchange1_tickers[ticker]} - {exchange2_tickers[ticker]}")
+                 print(f"ERROR:{ticker}- {exchange1_tickers[ticker]} - {exchange2_tickers[ticker]}")
                  continue
 
             if percentage_diffs[f"percentage_to_{exchange1}"] > 3:
@@ -87,7 +55,7 @@ def get_arbtg(exchange1, exchange2, exchange1_tickers, exchange2_tickers):
                 percentage_diffs[f"percentage_to_{exchange2}"] = difference / exchange2_tickers[ticker] * 100
                 percentage_diffs[f"percentage_to_{exchange1}"] = (difference / exchange1_tickers[ticker]) * 100
             except ZeroDivisionError as e:
-                 print(f"ERROR: price1:{exchange1_tickers[ticker]} - price2:{exchange2_tickers[ticker]}")
+                 print(f"ERROR`:{ticker}- {exchange1_tickers[ticker]} - {exchange2_tickers[ticker]}")
                  continue
 
             if percentage_diffs[f"percentage_to_{exchange2}"] > 3:

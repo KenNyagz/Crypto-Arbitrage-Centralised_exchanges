@@ -4,6 +4,8 @@ from Binance.get_tickers import get_tickers as binance_tickers_
 from Huobi.get_tickers import get_tickers as huobi_tickers_
 from OKX.get_tickers import get_tickers as okx_tickers
 from GateIO.get_tickers import get_tickers as gateio_tickers
+from Bybit.get_tickers import get_tickers as bybit_tickers
+
 
 def get_secret(file_name):
     """
@@ -70,6 +72,7 @@ binance_tickers = binance_tickers_(binance_secret)
 huobi_tickers = huobi_tickers_()
 okx_tickers = okx_tickers(okx_secret)
 gateio_tickers = gateio_tickers("test")
+bybit_tickers = bybit_tickers()
 
 def get_arbtg(exchange1, exchange2, exchange1_tickers, exchange2_tickers):
     """
@@ -110,6 +113,8 @@ def get_arbtg(exchange1, exchange2, exchange1_tickers, exchange2_tickers):
             print(f"{ticker}: {percentage_diff:.2f}%")
 
 # Example usage
-print('\n OkX and Binance\n', get_arbtg('okx', 'binance', okx_tickers, binance_tickers))
-print('\n Huobi and Binance\n', get_arbtg('huobi', 'binance', huobi_tickers, binance_tickers))
-print('\n OkX and Huobi\n', get_arbtg('okx', 'huobi', okx_tickers, huobi_tickers))
+#print('\n OkX and Binance\n', get_arbtg('okx', 'binance', okx_tickers, binance_tickers))
+#print('\n Huobi and Binance\n', get_arbtg('huobi', 'binance', huobi_tickers, binance_tickers))
+#print('\n OkX and Huobi\n', get_arbtg('okx', 'huobi', okx_tickers, huobi_tickers))
+#print('\n binance and gateio\n',get_arbtg('binance', 'gateio', binance_tickers, gateio_ti    ckers))
+print('\n bybit and Huobi\n', get_arbtg('bybit', 'huobi', bybit_tickers, huobi_tickers))
