@@ -115,6 +115,6 @@ def get_arbtg(exchange1, exchange2, exchange1_tickers, exchange2_tickers):
 # Example usage
 #print('\n OkX and Binance\n', get_arbtg('okx', 'binance', okx_tickers, binance_tickers))
 #print('\n Huobi and Binance\n', get_arbtg('huobi', 'binance', huobi_tickers, binance_tickers))
-#print('\n OkX and Huobi\n', get_arbtg('okx', 'huobi', okx_tickers, huobi_tickers))
+print('\n OkX and Huobi\n', get_arbtg('okx', 'huobi', okx_tickers, huobi_tickers))
 #print('\n binance and gateio\n',get_arbtg('binance', 'gateio', binance_tickers, gateio_ti    ckers))
 print('\n bybit and Huobi\n', get_arbtg('bybit', 'huobi', bybit_tickers, huobi_tickers))
