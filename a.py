@@ -49,6 +49,6 @@ def get_arbtg(exchange1, exchange2, exchange1_tickers, exchange2_tickers):
             print(f"{ticker}: {percentage_diff:.2f}%")
 
 # Example usage remains the same
-#print('\n OkX and Binance\n', get_arbtg('okx', 'binance', okx_tickers, binance_tickers))
-#print('\n Huobi and Binance\n', get_arbtg('huobi', 'binance', huobi_tickers, binance_tickers))
+print('\n OkX and Binance\n', get_arbtg('okx', 'binance', okx_tickers, binance_tickers))
+print('\n Huobi and Binance\n', get_arbtg('huobi', 'binance', huobi_tickers, binance_tickers))
 print('\n OkX and Huobi\n', get_arbtg('okx', 'huobi', okx_tickers, huobi_tickers))
