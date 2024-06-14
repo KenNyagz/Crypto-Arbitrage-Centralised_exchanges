@@ -1,21 +1,20 @@
-import plotly.graph_objects as go
+import matplotlib.pyplot as plt
 
-def plot_arbitrage_opportunities(arbitrage_data):
+def plot_arbitrage_opportunities(arbitrage_opportunities):
     """
     Plot arbitrage opportunities.
 
     Args:
-        arbitrage_data (dict): Arbitrage data to plot.
+        arbitrage_opportunities (dict): Arbitrage opportunities to plot.
     """
-    tickers = list(arbitrage_data.keys())
-    values = list(arbitrage_data.values())
+    tickers = list(arbitrage_opportunities.keys())
+    percentage_diffs = [data['percentage_diff'] for data in arbitrage_opportunities.values()]
 
-    fig = go.Figure(data=[go.Bar(x=tickers, y=values)])
-
-    fig.update_layout(
-        title='Arbitrage Opportunities',
-        xaxis_title='Ticker',
-        yaxis_title='Arbitrage Percentage'
-    )
-
-    fig.show()
+    plt.figure(figsize=(10, 6))
+    plt.bar(tickers, percentage_diffs, color='blue')
+    plt.xlabel('Tickers')
+    plt.ylabel('Percentage Difference')
+    plt.title('Arbitrage Opportunities')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()

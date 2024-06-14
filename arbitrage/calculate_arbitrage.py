@@ -1,30 +1,18 @@
-def get_arbtg(exchange1_name, exchange2_name, exchange1_tickers, exchange2_tickers):
-    """
-    Identify common tickers between two exchanges and calculate the percentage differences.
-
-    Args:
-        exchange1_name (str): Name of the first exchange.
-        exchange2_name (str): Name of the second exchange.
-        exchange1_tickers (dict): Ticker data from the first exchange.
-        exchange2_tickers (dict): Ticker data from the second exchange.
-
-    Returns:
-        dict: Arbitrage opportunities.
-    """
-    common_tickers = {}
-    for ticker in exchange1_tickers:
-        if ticker in exchange2_tickers:
-            common_tickers[ticker] = exchange1_tickers[ticker]
-
-    percentage_diffs = {}
-    for ticker in common_tickers:
-        if exchange1_tickers[ticker]['last'] > exchange2_tickers[ticker]['last']:
-            difference = exchange1_tickers[ticker]['last'] - exchange2_tickers[ticker]['last']
-            percentage_diff = difference / exchange1_tickers[ticker]['last'] * 100
-            percentage_diffs[ticker] = percentage_diff
-        elif exchange2_tickers[ticker]['last'] > exchange1_tickers[ticker]['last']:
-            difference = exchange2_tickers[ticker]['last'] - exchange1_tickers[ticker]['last']
-            percentage_diff = difference / exchange2_tickers[ticker]['last'] * 100
-            percentage_diffs[ticker] = percentage_diff
-
-    return percentage_diffs
+def calculate_arbitrage(self):
+    opportunities = []
+    # Iterate through all tickers in the exchange data
+    for ticker in self.data.keys():
+        for target_exchange_name, target_exchange in self.target_exchanges.items():
+            if ticker in target_exchange.keys():
+                # Calculate the price difference
+                price_diff = (self.data[ticker]['last'] - target_exchange[ticker]['last']) / self.data[ticker]['last'] * 100
+                if abs(price_diff) > 0:
+                    opportunities.append({
+                        'ticker': ticker,
+                        'source_exchange': self.name,
+                        'target_exchange': target_exchange_name,
+                        'source_price': self.data[ticker]['last'],
+                        'target_price': target_exchange[ticker]['last'],
+                        'price_diff': price_diff
+                    })
+    return opportunities
