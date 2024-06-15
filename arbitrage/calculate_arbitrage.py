@@ -25,7 +25,7 @@ class ArbitrageCalculator:
         list: A list of dictionaries containing arbitrage opportunities.
         """
         opportunities = []
-        
+
         # Iterate through all tickers in the source exchange data
         for ticker, source_data in self.data.items():
             # Iterate through all target exchanges
@@ -33,10 +33,10 @@ class ArbitrageCalculator:
                 # Check if the target exchange has the same ticker
                 if ticker in target_exchange:
                     target_data = target_exchange[ticker]
-                    
+
                     # Calculate the price difference as a percentage
                     price_diff = (source_data['last'] - target_data['last']) / source_data['last'] * 100
-                    
+
                     # Check if the price difference exceeds the threshold
                     if abs(price_diff) >= self.threshold:
                         # Create an arbitrage opportunity dictionary
@@ -48,20 +48,11 @@ class ArbitrageCalculator:
                             'target_price': target_data['last'],
                             'price_diff': price_diff
                         }
-                        
+
                         # Add the opportunity to the list
                         opportunities.append(opportunity)
-                        
+
                         # Log the opportunity for debugging and monitoring
                         logging.info(f"Arbitrage Opportunity: {opportunity}")
-        
+
         return opportunities
-
-
-
-# Calculate arbitrage opportunities
-opportunities = ArbitrageCalculator.calculate_arbitrage()
-
-# Print all detected arbitrage opportunities
-for opportunity in opportunities:
-    print(opportunity)

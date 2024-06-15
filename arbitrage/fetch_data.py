@@ -1,6 +1,6 @@
 import ccxt
 import logging
-from log_data import DataLogger
+from arbitrage.log_data import DataLogger
 
 class DataFetcher:
     def __init__(self, exchange_name, api_key, api_secret):

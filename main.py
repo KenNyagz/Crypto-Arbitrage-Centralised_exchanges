@@ -1,7 +1,7 @@
 import logging
-from fetch_data import DataFetcher
-from calculate_arbitrage import ArbitrageCalculator
-from log_data import DataLogger
+from arbitrage.fetch_data import DataFetcher
+from arbitrage.calculate_arbitrage import ArbitrageCalculator
+from arbitrage.log_data import DataLogger
 
 def main():
     """
@@ -52,11 +52,6 @@ def main():
             opportunity['target_price'],
             opportunity['price_diff']
         )
-
-    # Close data logger
-    data_logger.close()
-
-    logging.info("Arbitrage calculation process completed.")
 
 if __name__ == "__main__":
     main()
