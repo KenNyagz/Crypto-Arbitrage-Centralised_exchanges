@@ -1,74 +1,62 @@
-from connectivity.check_status import check_connection_and_api_status
-from arbitrage.fetch_data import Binance, Huobi, OKX, Gateio, Coinbase, Kraken, Bitfinex, Bittrex, Poloniex, Kucoin
-from arbitrage.calculate_arbitrage import ArbitrageCalculator
-from arbitrage.log_data import DataLogger
-from visualization.visualize import plot_arbitrage_opportunities
+import logging
+from fetch_data import DataFetcher
+from calculate_arbitrage import ArbitrageCalculator
+from log_data import DataLogger
 
-# Setup database and logger
-logger = DataLogger()
+def main():
+    """
+    Main function to execute the arbitrage calculation process.
+    """
+    logging.basicConfig(level=logging.INFO)
 
-# API URLs to check
-api_urls = [
-    'https://api.binance.com',
-    'https://api.huobi.pro',
-    'https://www.okx.com',
-    'https://api.gateio.ws',
-    'https://api.pro.coinbase.com',
-    'https://api.kraken.com',
-    'https://api.bitfinex.com',
-    'https://api.bittrex.com',
-    'https://api.poloniex.com',
-    'https://api.kucoin.com'
-]
+    # Define the exchanges and initialize their respective data fetchers
+    exchanges = {
+        'binance': DataFetcher('binance', 'binance_api_key', 'binance_secret'),
+        'huobi': DataFetcher('huobi', 'huobi_api_key', 'huobi_secret'),
+        'okx': DataFetcher('okx', 'okx_api_key', 'okx_secret')
+    }
 
-# Ensure there is an internet connection and check API statuses
-check_connection_and_api_status(api_urls)
+    # Fetch data from all exchanges
+    exchange_data = {}
+    for exchange_name, fetcher in exchanges.items():
+        try:
+            exchange_data[exchange_name] = fetcher.fetch_data()
+            logging.info(f"Fetched data for {exchange_name}: {exchange_data[exchange_name]}")
+        except Exception as e:
+            logging.error(f"Error fetching data for {exchange_name}: {e}")
 
-# Initialize exchanges
-exchange_classes = {
-    'binance': Binance,
-    'huobi': Huobi,
-    'okx': OKX,
-    'gateio': Gateio,
-    'coinbase': Coinbase,
-    'kraken': Kraken,
-    'bitfinex': Bitfinex,
-    'bittrex': Bittrex,
-    'poloniex': Poloniex,
-    'kucoin': Kucoin
-}
-exchanges = {name: exchange_class() for name, exchange_class in exchange_classes.items()}
+    # Initialize the target exchanges dictionary
+    target_exchanges = {name: data for name, data in exchange_data.items() if name != 'binance'}
 
-# Log exchange names and get their IDs
-exchange_ids = {name: logger.log_exchange(name) for name in exchanges}
+    # Initialize the arbitrage calculator
+    arbitrage_calculator = ArbitrageCalculator(
+        name='binance',
+        data=exchange_data['binance'],
+        target_exchanges=target_exchanges,
+        threshold=1.0
+    )
 
-# Fetch ticker data for all exchanges
-tickers = {}
-for name, exchange in exchanges.items():
-    tickers[name] = exchange.fetch_tickers()
-    # Log ticker data
-    for ticker, data in tickers[name].items():
-        logger.log_ticker(exchange_ids[name], ticker, data['last'])
+    # Calculate arbitrage opportunities
+    opportunities = arbitrage_calculator.calculate_arbitrage()
 
-# Calculate and log arbitrage opportunities between all pairs of exchanges
-for exchange1_name, exchange1_data in tickers.items():
-    for exchange2_name, exchange2_data in tickers.items():
-        if exchange1_name != exchange2_name:
-            arbitrage_calculator = ArbitrageCalculator(exchange1_name, exchange1_data, {exchange2_name: exchange2_data})
-            arbitrage_opportunities = arbitrage_calculator.calculate_arbitrage()
-            # Log arbitrage opportunities
-            for opportunity in arbitrage_opportunities:
-                logger.log_arbitrage_opportunity(
-                    exchange_ids[opportunity['source_exchange']],
-                    exchange_ids[opportunity['target_exchange']],
-                    opportunity['ticker'],
-                    opportunity['source_price'],
-                    opportunity['target_price'],
-                    opportunity['price_diff']
-                )
-            if arbitrage_opportunities:
-                print(f"\nArbitrage Opportunities between {exchange1_name} and {exchange2_name}:")
-                plot_arbitrage_opportunities(arbitrage_opportunities)
+    # Log opportunities to the database
+    data_logger = DataLogger('arbitrage.db')
+    for opportunity in opportunities:
+        buy_exchange_id = data_logger.log_exchange(opportunity['source_exchange'])
+        sell_exchange_id = data_logger.log_exchange(opportunity['target_exchange'])
+        data_logger.log_arbitrage_opportunity(
+            buy_exchange_id,
+            sell_exchange_id,
+            opportunity['ticker'],
+            opportunity['source_price'],
+            opportunity['target_price'],
+            opportunity['price_diff']
+        )
 
-# Close the logger
-logger.close()
+    # Close data logger
+    data_logger.close()
+
+    logging.info("Arbitrage calculation process completed.")
+
+if __name__ == "__main__":
+    main()

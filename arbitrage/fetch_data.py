@@ -1,70 +1,41 @@
 import ccxt
-import os
+import logging
+from log_data import DataLogger
 
-class Exchange:
-    def __init__(self, exchange_name, api_key_file):
+class DataFetcher:
+    def __init__(self, exchange_name, api_key, api_secret):
+        """
+        Initialize the DataFetcher with exchange credentials.
+
+        Parameters:
+        exchange_name (str): The name of the exchange.
+        api_key (str): The API key for the exchange.
+        api_secret (str): The API secret for the exchange.
+        """
         self.exchange_name = exchange_name
-        self.api_key_file = api_key_file
-        self.exchange = self._initialize_exchange()
-    
-    def _initialize_exchange(self):
-        with open(self.api_key_file, 'r') as f:
-            api_key, api_secret = f.read().strip().split('\n')
-        
-        exchange_class = getattr(ccxt, self.exchange_name)
-        exchange = exchange_class({
+        self.api_key = api_key
+        self.api_secret = api_secret
+        self.exchange = getattr(ccxt, exchange_name)({
             'apiKey': api_key,
             'secret': api_secret
         })
-        return exchange
-    
-    def fetch_tickers(self):
-        try:
-            tickers = self.exchange.fetch_tickers()
-            return tickers
-        except ccxt.NetworkError as e:
-            print(f"Network error while fetching tickers from {self.exchange_name}: {e}")
-            return {}
-        except ccxt.ExchangeError as e:
-            print(f"Exchange error while fetching tickers from {self.exchange_name}: {e}")
-            return {}
+        self.data_logger = DataLogger()
 
-class Binance(Exchange):
-    def __init__(self):
-        super().__init__('binance', 'keys/binance_key.txt')
+    def fetch_data(self):
+        """
+        Fetch ticker data from the exchange and log it.
 
-class Huobi(Exchange):
-    def __init__(self):
-        super().__init__('huobi', 'keys/huobi_key.txt')
+        Returns:
+        dict: A dictionary of ticker data.
+        """
+        tickers = self.exchange.fetch_tickers()
+        exchange_id = self.data_logger.log_exchange(self.exchange_name)
+        for ticker, data in tickers.items():
+            self.data_logger.log_ticker(exchange_id, ticker, data['last'])
+        return tickers
 
-class OKX(Exchange):
-    def __init__(self):
-        super().__init__('okx', 'keys/okx_key.txt')
-
-class Gateio(Exchange):
-    def __init__(self):
-        super().__init__('gateio', 'keys/gateio_key.txt')
-
-class Coinbase(Exchange):
-    def __init__(self):
-        super().__init__('coinbase', 'keys/coinbase_key.txt')
-
-class Kraken(Exchange):
-    def __init__(self):
-        super().__init__('kraken', 'keys/kraken_key.txt')
-
-class Bitfinex(Exchange):
-    def __init__(self):
-        super().__init__('bitfinex', 'keys/bitfinex_key.txt')
-
-class Bittrex(Exchange):
-    def __init__(self):
-        super().__init__('bittrex', 'keys/bittrex_key.txt')
-
-class Poloniex(Exchange):
-    def __init__(self):
-        super().__init__('poloniex', 'keys/poloniex_key.txt')
-
-class Kucoin(Exchange):
-    def __init__(self):
-        super().__init__('kucoin', 'keys/kucoin_key.txt')
+    def close(self):
+        """
+        Close the data logger.
+        """
+        self.data_logger.close()
