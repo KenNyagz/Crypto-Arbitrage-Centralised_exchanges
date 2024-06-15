@@ -11,9 +11,9 @@ def main():
 
     # Define the exchanges and initialize their respective data fetchers
     exchanges = {
-        'binance': DataFetcher('binance', 'binance_api_key', 'binance_secret'),
-        'huobi': DataFetcher('huobi', 'huobi_api_key', 'huobi_secret'),
-        'okx': DataFetcher('okx', 'okx_api_key', 'okx_secret')
+        'binance': DataFetcher('binance'),
+        'huobi': DataFetcher('huobi'),
+        'okx': DataFetcher('okx')
     }
 
     # Fetch data from all exchanges

@@ -1,23 +1,22 @@
 import ccxt
 import logging
 from arbitrage.log_data import DataLogger
+from keys.api_keys import api_keys
 
 class DataFetcher:
-    def __init__(self, exchange_name, api_key, api_secret):
+    def __init__(self, exchange_name):
         """
         Initialize the DataFetcher with exchange credentials.
 
         Parameters:
         exchange_name (str): The name of the exchange.
-        api_key (str): The API key for the exchange.
-        api_secret (str): The API secret for the exchange.
         """
         self.exchange_name = exchange_name
-        self.api_key = api_key
-        self.api_secret = api_secret
+        self.api_key = api_keys[exchange_name]['api_key']
+        self.api_secret = api_keys[exchange_name]['secret']
         self.exchange = getattr(ccxt, exchange_name)({
-            'apiKey': api_key,
-            'secret': api_secret
+            'apiKey': self.api_key,
+            'secret': self.api_secret
         })
         self.data_logger = DataLogger()
 
