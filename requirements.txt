@@ -33,7 +33,7 @@ Brlapi==0.8.3
 Brotli==1.0.9
 bs4==0.0.1
 cachetools==5.2.1
-ccxt==1.89.99
+ccxt==4.3.46
 certifi==2023.7.22
 cffi==1.15.1
 cfgv==3.3.1
@@ -216,11 +216,13 @@ pickleshare==0.7.5
 Pillow==10.0.0
 pipwin==0.5.2
 platformdirs==2.5.1
+plotly==5.22.0
 pluggy==1.0.0
 ply==3.11
 portend==3.2.0
 pre-commit==2.20.0
 pre-commit-hooks @ file:///home/kila/.cache/pre-commit/repo_4290z9a
+prettytable==3.10.0
 prices==1.1.0
 prometheus-client==0.15.0
 promise==2.3
@@ -337,6 +339,7 @@ sympy==1.9
 systemd-python==234
 tabulate==0.8.9
 tempora==5.5.0
+tenacity==8.3.0
 tensorboard==2.11.0
 tensorboard-data-server==0.6.1
 tensorboard-plugin-wit==1.8.1

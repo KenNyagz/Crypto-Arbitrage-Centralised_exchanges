@@ -1,57 +1,67 @@
 import logging
-from arbitrage.fetch_data import DataFetcher
+from time import sleep
 from arbitrage.calculate_arbitrage import ArbitrageCalculator
-from arbitrage.log_data import DataLogger
+from arbitrage.fetch_data import DataFetcher
+from arbitrage.log_data import ArbitrageOpportunity, DatabaseLogger
+from visualization.visualize import visualize_opportunities
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger('main')
+
+def dot_animation(seconds):
+    """
+    Displays a dot animation for the specified number of seconds.
+    """
+    for _ in range(seconds):
+        print(".", end="", flush=True)
+        sleep(1)
+    print()  # Move to the next line after the animation
 
 def main():
-    """
-    Main function to execute the arbitrage calculation process.
-    """
-    logging.basicConfig(level=logging.INFO)
+    # Initialize the database logger and create tables
+    db_logger = DatabaseLogger('arbitrage.db')
 
-    # Define the exchanges and initialize their respective data fetchers
-    exchanges = {
-        'binance': DataFetcher('binance'),
-        'huobi': DataFetcher('huobi'),
-        'okx': DataFetcher('okx')
-    }
+    # List of supported exchanges and symbols
+    exchanges = [
+        'binance', 'kraken', 'bitfinex', 'bittrex', 
+        'poloniex', 'huobi', 'okx', 'coinbasepro', 
+        'bitstamp', 'gemini'
+    ]
+    symbols = ['BTC/USD', 'ETH/USD', 'LTC/USD']
 
-    # Fetch data from all exchanges
-    exchange_data = {}
-    for exchange_name, fetcher in exchanges.items():
-        try:
-            exchange_data[exchange_name] = fetcher.fetch_data()
-            logging.info(f"Fetched data for {exchange_name}: {exchange_data[exchange_name]}")
-        except Exception as e:
-            logging.error(f"Error fetching data for {exchange_name}: {e}")
+    # Initialize DataFetcher and ArbitrageCalculator
+    data_fetcher = DataFetcher(exchanges, symbols)
+    arbitrage_calculator = ArbitrageCalculator(db_logger)
 
-    # Initialize the target exchanges dictionary
-    target_exchanges = {name: data for name, data in exchange_data.items() if name != 'binance'}
+    while True:
+        # Fetch data
+        logger.info("Fetching data from exchanges...")
+        dot_animation(5)  # Display dot animation for 5 seconds
+        data = data_fetcher.fetch_data()
 
-    # Initialize the arbitrage calculator
-    arbitrage_calculator = ArbitrageCalculator(
-        name='binance',
-        data=exchange_data['binance'],
-        target_exchanges=target_exchanges,
-        threshold=1.0
-    )
+        # Store fetched data in the database
+        for symbol, exchange_data in data.items():
+            for exchange_name, ticker_data in exchange_data.items():
+                if ticker_data:
+                    db_logger.log_ticker(exchange_name, symbol, ticker_data['last'])
 
-    # Calculate arbitrage opportunities
-    opportunities = arbitrage_calculator.calculate_arbitrage()
+        # Calculate arbitrage opportunities
+        logger.info("Calculating arbitrage opportunities...")
+        opportunities = arbitrage_calculator.calculate_arbitrage(data)
 
-    # Log opportunities to the database
-    data_logger = DataLogger('arbitrage.db')
-    for opportunity in opportunities:
-        buy_exchange_id = data_logger.log_exchange(opportunity['source_exchange'])
-        sell_exchange_id = data_logger.log_exchange(opportunity['target_exchange'])
-        data_logger.log_arbitrage_opportunity(
-            buy_exchange_id,
-            sell_exchange_id,
-            opportunity['ticker'],
-            opportunity['source_price'],
-            opportunity['target_price'],
-            opportunity['price_diff']
-        )
+        if opportunities:
+            logger.info(f"Found {len(opportunities)} arbitrage opportunities")
+            for opportunity in opportunities:
+                db_logger.log_opportunity(opportunity)
+        else:
+            logger.info("No arbitrage opportunities found")
+
+        # Visualize the arbitrage opportunities
+        visualize_opportunities('arbitrage.db')
+
+        # Wait for 30 seconds before refreshing
+        sleep(30)
 
 if __name__ == "__main__":
     main()
