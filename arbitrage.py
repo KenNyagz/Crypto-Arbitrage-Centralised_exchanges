@@ -1,9 +1,9 @@
 #!/usr/bin/python3
-from binance import Client
 from Binance.get_tickers import get_tickers as binance_tickers_
 from Huobi.get_tickers import get_tickers as huobi_tickers_
 from OKX.get_tickers import get_tickers as okx_tickers
 from GateIO.get_tickers import get_tickers as gateio_tickers
+#from binance import Client
 
 def get_secret(file_name):
     if not isinstance(file_name, str):
@@ -73,3 +73,4 @@ print('\n OkX and Binance\n', get_arbtg('okx', 'binance', okx_tickers, binance_t
 print('\n Huobi and Binance\n', get_arbtg('huobi', 'binance', huobi_tickers, binance_tickers))
 print('OkX and Huobi\n', get_arbtg('okx', 'huobi', okx_tickers, huobi_tickers))
 print('\n binance and gateio\n',get_arbtg('binance', 'gateio', binance_tickers, gateio_tickers))
+#print('\n binance and gateio\n',get_arbtg('bybit', 'gateio', binance_tickers, gateio_tickers))

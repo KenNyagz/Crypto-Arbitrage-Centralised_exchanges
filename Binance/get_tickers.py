@@ -1,30 +1,27 @@
-from binance import Client
+import requests
 
 
 def get_tickers(binance_secret=None):
-    if binance_secret is None:
-        with open("api_secret", 'r') as f:
+    if binance_secret == None:
+        with open('api_secret', 'r') as f:
             secret = f.read()
     else:
         secret = binance_secret
+    public_key = ''
 
-    pub = "xab1YQKg42rWQviBVcViQinX6fkYd7hVM6hndxUsWT4Q3xRXP0XeEhmdJnGVMbrV"
-    client = Client(pub, secret)
-    #https://api.binance.com/api/v3/ticker/bookTicker - An alternative way which we 
-                                                       #can use requests module
+    url = 'https://api.binance.com/api/v3/ticker/bookTicker'
+    response = requests.get(url)
+    data = response.json()
 
-    tickers = client.get_all_tickers()
-    pairs_list = {}
+    pairs_prices = {}
+    for i in data:
+        pair = i['symbol']
+        price = i['bidPrice']
+        pairs_prices.update({pair: float(price)})
 
-    for i in tickers:
-        for key in i:
-            pair = i['symbol']
-            price = i['price']
-            pairs_list.update({pair: float(price)})
-
-    #for pair in pairs_list:
-    #    print(pair,':', pairs_list[pair])
-    return pairs_list
+    #for pair in pairs_prices:
+    #    print(pair, ':', pairs_prices[pair]) # visualisation
+    return pairs_prices
 
 
 if __name__ == "__main__":
