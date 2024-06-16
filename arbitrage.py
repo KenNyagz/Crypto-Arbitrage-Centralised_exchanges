@@ -73,4 +73,4 @@ print('\n OkX and Binance\n', get_arbtg('okx', 'binance', okx_tickers, binance_t
 print('\n Huobi and Binance\n', get_arbtg('huobi', 'binance', huobi_tickers, binance_tickers))
 print('OkX and Huobi\n', get_arbtg('okx', 'huobi', okx_tickers, huobi_tickers))
 print('\n binance and gateio\n',get_arbtg('binance', 'gateio', binance_tickers, gateio_tickers))
-#print('\n binance and gateio\n',get_arbtg('bybit', 'gateio', binance_tickers, gateio_tickers))
+print('\n binance and gateio\n',get_arbtg('bybit', 'gateio', binance_tickers, gateio_tickers))
