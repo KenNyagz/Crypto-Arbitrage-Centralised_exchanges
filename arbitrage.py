@@ -43,7 +43,7 @@ def get_arbtg(exchange1, exchange2, exchange1_tickers, exchange2_tickers):
                 percentage_diffs[f"percentage_to_{exchange1}"] = difference / exchange1_tickers[ticker] * 100
                 percentage_diffs[f"percentage_to_{exchange2}"] = (difference / exchange2_tickers[ticker]) * 100
             except ZeroDivisionError as e:
-                 print(f"zeroDivERROR:{ticker} : {exchange1_tickers[ticker]} ~ {exchange2_tickers[ticker]}")
+                 #print(f"zeroDivERROR:{ticker} : {exchange1_tickers[ticker]} ~ {exchange2_tickers[ticker]}")
                  continue
 
             if percentage_diffs[f"percentage_to_{exchange1}"] > 3:
@@ -59,7 +59,7 @@ def get_arbtg(exchange1, exchange2, exchange1_tickers, exchange2_tickers):
                 percentage_diffs[f"percentage_to_{exchange2}"] = difference / exchange2_tickers[ticker] * 100
                 percentage_diffs[f"percentage_to_{exchange1}"] = (difference / exchange1_tickers[ticker]) * 100
             except ZeroDivisionError as e:
-                 print(f"zeroDivERROR:{ticker} : {exchange1_tickers[ticker]} ~ {exchange2_tickers[ticker]}")
+                 #print(f"zeroDivERROR:{ticker} : {exchange1_tickers[ticker]} ~ {exchange2_tickers[ticker]}")
                  continue
 
             if percentage_diffs[f"percentage_to_{exchange2}"] > 3:
@@ -71,12 +71,13 @@ def get_arbtg(exchange1, exchange2, exchange1_tickers, exchange2_tickers):
 
     return result
 
-print('OkX and Binance\n')
-print('\n OkX and Binance\n', get_arbtg('okx', 'binance', okx_tickers, binance_tickers))
-print('\n Huobi and Binance\n', get_arbtg('huobi', 'binance', huobi_tickers, binance_tickers))
-print('\nOkX and Huobi\n', get_arbtg('okx', 'huobi', okx_tickers, huobi_tickers))
-print('\n binance and gateio\n',get_arbtg('binance', 'gateio', binance_tickers, gateio_tickers))
-print('\n Bybit and Gateio\n',get_arbtg('bybit', 'gateio', bybit_tickers, gateio_tickers))
 print('\n Binance and Bybit\n',get_arbtg('binance', 'bybit', binance_tickers, bybit_tickers))
-print('\nOkX and Bybit\n', get_arbtg('okx', 'bybit', okx_tickers, bybit_tickers))
-print('\nBybit and Huobi\n', get_arbtg('bybit', 'huobi', bybit_tickers, huobi_tickers))
+print('\n Binance and Huobi\n', get_arbtg('binance', 'huobi', binance_tickers, huobi_tickers))
+print('\n Binance and OKX\n', get_arbtg('binance', 'okx', binance_tickers, okx_tickers))
+print('\n Binance and gateio\n',get_arbtg('binance', 'gateio', binance_tickers, gateio_tickers))
+print('\n Bybit and Huobi\n', get_arbtg('bybit', 'huobi', bybit_tickers, huobi_tickers))
+print('\n Bybit and OKX\n', get_arbtg('bybit', 'okx', bybit_tickers, okx_tickers,))
+print('\n Bybit and Gateio\n',get_arbtg('bybit', 'gateio', bybit_tickers, gateio_tickers))
+print('\n Huobi and OKX\n', get_arbtg('huobi', 'okx', huobi_tickers, okx_tickers))
+print('\n Huobi and GateIO\n', get_arbtg('huobi', 'gateio', huobi_tickers, gateio_tickers))
+print('\n OKX and GateIO\n', get_arbtg('okx', 'gateio', okx_tickers, gateio_tickers))
