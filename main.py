@@ -1,67 +1,105 @@
 import logging
-from time import sleep
-from arbitrage.calculate_arbitrage import ArbitrageCalculator
+import threading
+import time
+import concurrent.futures
 from arbitrage.fetch_data import DataFetcher
-from arbitrage.log_data import ArbitrageOpportunity, DatabaseLogger
-from visualization.visualize import visualize_opportunities
+from arbitrage.calculate_arbitrage import ArbitrageCalculator
+from arbitrage.log_data import DatabaseLogger
+from visualization.visualize import plot_opportunities
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
+# Configure logging to display info messages with timestamps
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger('main')
 
-def dot_animation(seconds):
+def fetch_data_task(data_fetcher):
     """
-    Displays a dot animation for the specified number of seconds.
+    Fetch market data using the DataFetcher instance.
     """
-    for _ in range(seconds):
-        print(".", end="", flush=True)
-        sleep(1)
-    print()  # Move to the next line after the animation
+    logger.info("Fetching market data.")
+    data = data_fetcher.fetch_data()
+    logger.info("Market data fetched successfully.")
+    return data
+
+def calculate_arbitrage_task(data, arbitrage_calculator):
+    """
+    Calculate arbitrage opportunities using the provided market data and ArbitrageCalculator instance.
+    """
+    logger.info("Calculating arbitrage opportunities.")
+    executable_opportunities, outliers = arbitrage_calculator.calculate_arbitrage(data)
+    logger.info("Arbitrage opportunities calculated successfully.")
+    return executable_opportunities, outliers
+
+def visualize_task():
+    """
+    Visualize the arbitrage opportunities stored in the database.
+    """
+    logger.info("Visualizing arbitrage opportunities.")
+    plot_opportunities('arbitrage.db')
 
 def main():
-    # Initialize the database logger and create tables
-    db_logger = DatabaseLogger('arbitrage.db')
-
-    # List of supported exchanges and symbols
-    exchanges = [
-        'binance', 'kraken', 'bitfinex', 'bittrex', 
-        'poloniex', 'huobi', 'okx', 'coinbasepro', 
-        'bitstamp', 'gemini'
-    ]
-    symbols = ['BTC/USD', 'ETH/USD', 'LTC/USD']
-
-    # Initialize DataFetcher and ArbitrageCalculator
-    data_fetcher = DataFetcher(exchanges, symbols)
-    arbitrage_calculator = ArbitrageCalculator(db_logger)
-
     while True:
-        # Fetch data
-        logger.info("Fetching data from exchanges...")
-        dot_animation(5)  # Display dot animation for 5 seconds
-        data = data_fetcher.fetch_data()
+        logger.info("Starting the arbitrage detection process.")
 
-        # Store fetched data in the database
-        for symbol, exchange_data in data.items():
-            for exchange_name, ticker_data in exchange_data.items():
-                if ticker_data:
-                    db_logger.log_ticker(exchange_name, symbol, ticker_data['last'])
+        # Define the exchanges and symbols to fetch data for
+        exchanges = ['binance', 'kraken', 'htx', 'coinbase', 'bitfinex', 'gemini', 'bittrex', 'bybit', 'huobi']
+        symbols = [
+            'ETH/USD', 'BTC/USD', 'USDT/USD', 'BNB/USDT', 'ADA/USD', 'XRP/USD',
+            'LTC/USD', 'SOL/USD', 'DOT/USD', 'LINK/USD', 'USDC/USD'
+        ]
+        public_api_urls = {
+            'binance': 'https://api.binance.com/api/v3/ticker/price',
+            'kraken': 'https://api.kraken.com/0/public/Ticker',
+            'coinbase_pro': 'https://api.pro.coinbase.com/products/ticker',
+            'cryptocompare': 'https://min-api.cryptocompare.com/data/pricemultifull',
+            'coinmarketcap': 'https://api.coinmarketcap.com/v1/ticker/',
+            'huobi': 'https://api.huobi.com/market/tickers',
+            'gateio': 'https://api.gateio.ws/api/v4/spot/tickers',
+            'bitfinex': 'https://api.bitfinex.com/v2/tickers',
+            'bittrex': 'https://api.bittrex.com/v3/markets/tickers',
+            'poloniex': 'https://poloniex.com/public?command=returnTicker',
+            'kucoin': 'https://api.kucoin.com/api/v1/market/tickers'
+        }
 
-        # Calculate arbitrage opportunities
-        logger.info("Calculating arbitrage opportunities...")
-        opportunities = arbitrage_calculator.calculate_arbitrage(data)
+        # Initialize components
+        logger.info("Initializing data fetcher.")
+        data_fetcher = DataFetcher(exchanges, symbols, public_api_urls)
 
-        if opportunities:
-            logger.info(f"Found {len(opportunities)} arbitrage opportunities")
-            for opportunity in opportunities:
-                db_logger.log_opportunity(opportunity)
-        else:
-            logger.info("No arbitrage opportunities found")
+        logger.info("Initializing database logger.")
+        db_logger = DatabaseLogger('arbitrage.db')
 
-        # Visualize the arbitrage opportunities
-        visualize_opportunities('arbitrage.db')
+        logger.info("Initializing arbitrage calculator.")
+        arbitrage_calculator = ArbitrageCalculator(db_logger)
 
-        # Wait for 30 seconds before refreshing
-        sleep(30)
+        # Use ThreadPoolExecutor to fetch data and calculate arbitrage concurrently
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            # Submit fetch data task to the executor
+            future_data = executor.submit(fetch_data_task, data_fetcher)
+            data = future_data.result()
 
-if __name__ == "__main__":
+            # Submit calculate arbitrage task to the executor
+            future_arbitrage = executor.submit(calculate_arbitrage_task, data, arbitrage_calculator)
+            executable_opportunities, outliers = future_arbitrage.result()
+
+        # Log results
+        logger.info(f"Executable opportunities: {len(executable_opportunities)} found.")
+        for opportunity in executable_opportunities:
+            logger.info(opportunity)
+
+        logger.info(f"Outliers: {len(outliers)} found.")
+        for outlier in outliers:
+            logger.info(outlier)
+
+        # Visualize opportunities
+        visualize_task()
+
+        # Close database connection
+        logger.info("Closing database connection.")
+        db_logger.close()
+
+        logger.info("Arbitrage detection process completed.")
+
+        # Wait for 5 minutes (300 seconds) before the next execution
+        time.sleep(300)
+
+if __name__ == '__main__':
     main()

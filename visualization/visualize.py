@@ -1,106 +1,72 @@
 import sqlite3
-import plotly.graph_objs as go
-import plotly.offline as pyo
+import pandas as pd
 import time
-import webbrowser
+import plotly.graph_objects as go
 
-def fetch_opportunities(db_name):
-    """
-    Fetch arbitrage opportunities from the database.
+def fetch_opportunities(cursor):
+    # Fetch data from the opportunities table
+    cursor.execute('SELECT symbol, source_exchange, target_exchange, source_price, target_price, percentage FROM opportunities')
+    rows = cursor.fetchall()
+    return rows
 
-    Parameters:
-        db_name (str): The name of the database.
+def plot_opportunities(db_name):
+    # Connect to the database
+    connection = sqlite3.connect(db_name)
+    cursor = connection.cursor()
 
-    Returns:
-        list: A list of arbitrage opportunities.
-    """
-    conn = sqlite3.connect(db_name)
-    cursor = conn.cursor()
+    # Initialize an empty figure widget
+    fig = go.FigureWidget()
 
-    try:
-        cursor.execute('''SELECT symbol, base_currency, quote_currency, source_exchange, target_exchange, 
-                                 source_price, target_price, source_fee, target_fee, volume, timestamp 
-                          FROM arbitrage_opportunities''')
-        opportunities = cursor.fetchall()
-    except sqlite3.OperationalError as e:
-        if 'no such table' in str(e):
-            opportunities = []
-        else:
-            raise
-    finally:
-        conn.close()
-    
-    return opportunities
+    # Function to update the table
+    def update_table():
+        rows = fetch_opportunities(cursor)
 
-def visualize_opportunities(db_name):
-    """
-    Visualize arbitrage opportunities stored in the database using Plotly.
+        if not rows:
+            print("No data available to plot.")
+            return
 
-    Parameters:
-        db_name (str): The name of the database.
-    """
-    html_file = 'arbitrage_opportunities.html'
-    first_run = True
+        # Create a DataFrame
+        df = pd.DataFrame(rows, columns=['symbol', 'source_exchange', 'target_exchange', 'source_price', 'target_price', 'percentage'])
 
-    while True:
-        opportunities = fetch_opportunities(db_name)
+        # Sort DataFrame by percentage and select top N opportunities
+        top_n = 10  # Show top 10 opportunities
+        df = df.sort_values('percentage', ascending=False).head(top_n)
 
-        if opportunities:
-            symbols = []
-            source_exchanges = []
-            target_exchanges = []
-            source_prices = []
-            target_prices = []
+        # Create a table
+        fig.data = []
 
-            for opportunity in opportunities:
-                symbols.append(opportunity[0])
-                source_exchanges.append(opportunity[3])
-                target_exchanges.append(opportunity[4])
-                source_prices.append(opportunity[5])
-                target_prices.append(opportunity[6])
-
-            # Create a bar chart to visualize the prices
-            fig = go.Figure()
-
-            fig.add_trace(go.Bar(
-                name='Source Price',
-                x=symbols,
-                y=source_prices,
-                text=source_exchanges,
-                textposition='auto'
-            ))
-
-            fig.add_trace(go.Bar(
-                name='Target Price',
-                x=symbols,
-                y=target_prices,
-                text=target_exchanges,
-                textposition='auto'
-            ))
-
-            # Update the layout
-            fig.update_layout(
-                title='Arbitrage Opportunities',
-                xaxis_title='Symbol',
-                yaxis_title='Price',
-                barmode='group'
+        fig.add_trace(
+            go.Table(
+                header=dict(
+                    values=["Symbol", "Buy From", "Source Price", "Sell To", "Target Price", "Percentage Difference"],
+                    fill_color='paleturquoise',
+                    align='left',
+                    font=dict(size=14)
+                ),
+                cells=dict(
+                    values=[df.symbol, df.source_exchange, df.source_price, df.target_exchange, df.target_price, df.percentage],
+                    fill_color='lavender',
+                    align='left',
+                    font=dict(size=12)
+                )
             )
+        )
 
-            # Save the plot to an HTML file
-            pyo.plot(fig, filename=html_file, auto_open=False)
+        fig.update_layout(
+            title='Top Arbitrage Opportunities',
+            margin=dict(l=10, r=10, t=40, b=10)
+        )
 
-            # Open or refresh the plot in the browser
-            if first_run:
-                webbrowser.open_new_tab(html_file)
-                first_run = False
-            else:
-                webbrowser.open(html_file, new=0)
+    # Initial table
+    update_table()
 
-        else:
-            print("No arbitrage opportunities found.")
+    # Display the figure
+    fig.show()
 
-        # Fetch fresh data every minute
+    # Continuous update every minute
+    while True:
         time.sleep(60)
+        update_table()
 
-if __name__ == "__main__":
-    visualize_opportunities('arbitrage.db')
+if __name__ == '__main__':
+    plot_opportunities('arbitrage.db')

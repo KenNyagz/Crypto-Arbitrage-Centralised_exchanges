@@ -1,68 +1,94 @@
 import ccxt
 import logging
 import requests
+from keys.api_keys import api_keys
+
+# Set up logging
+logger = logging.getLogger('fetch_data')
+logger.setLevel(logging.INFO)
+if not logger.handlers:
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
 
 class DataFetcher:
-    def __init__(self, exchanges, symbols):
+    def __init__(self, exchanges, symbols, public_api_urls):
         self.exchanges = exchanges
         self.symbols = symbols
-        logging.basicConfig(level=logging.INFO)
-        self.logger = logging.getLogger('data_fetcher')
-        self.api_urls = {
-            'binance': 'https://api.binance.com/api/v3/ticker/price',
-            'huobi': 'https://api.huobi.pro/market/detail/merged',
-            'okex': 'https://www.okx.com/api/spot/v3/instruments/ticker',
-            'gateio': 'https://api.gateio.ws/api/v4/spot/tickers',
-            'coinbase_pro': 'https://api.pro.coinbase.com/products/{symbol}/ticker',
-            'kraken': 'https://api.kraken.com/0/public/Ticker',
-            'bitfinex': 'https://api.bitfinex.com/v1/pubticker/{symbol}',
-            'bittrex': 'https://api.bittrex.com/v3/markets/{symbol}/ticker',
-            'poloniex': 'https://api.poloniex.com/public?command=returnTicker',
-            'kucoin': 'https://api.kucoin.com/api/v1/market/orderbook/level1?symbol={symbol}-USDT'
-            # Add more exchanges and their API URLs as needed
-        }
+        self.public_api_urls = public_api_urls
 
-    def fetch_data_from_ccxt(self, exchange_name, symbol):
+    def fetch_ccxt_data(self, exchange_name):
         try:
             exchange_class = getattr(ccxt, exchange_name)
-            exchange = exchange_class()
-            tickers = exchange.fetch_tickers()
-            return tickers.get(symbol)
-        except ccxt.BaseError as e:
-            self.logger.error(f"Error fetching data for {symbol} on {exchange_name}: {str(e)}")
         except AttributeError:
-            self.logger.error(f"Exchange {exchange_name} not found in ccxt library.")
-        except Exception as e:
-            self.logger.error(f"General error fetching data for {symbol} on {exchange_name}: {str(e)}")
-        return None
+            logger.error(f"Exchange {exchange_name} is not supported by CCXT.")
+            return {}
 
-    def fetch_data_from_api_url(self, exchange_name, symbol):
-        try:
-            response = requests.get(self.api_urls[exchange_name])
-            response.raise_for_status()
-            data = response.json()
-
-            # Ensure data is a dictionary
-            if isinstance(data, list):
-                data = {item['symbol']: item for item in data}
-
-            return data.get(symbol)
-        except requests.RequestException as e:
-            self.logger.error(f"Error fetching data for {symbol} on {exchange_name} via API URL: {str(e)}")
-        return None
-
-
-    def fetch_data(self):
+        exchange = exchange_class()
         data = {}
         for symbol in self.symbols:
-            data[symbol] = {}
-            for exchange_name in self.exchanges:
-                if exchange_name in self.api_urls:
-                    ticker_data = self.fetch_data_from_api_url(exchange_name, symbol)
+            try:
+                ticker = exchange.fetch_ticker(symbol)
+                if 'last' in ticker:
+                    data[symbol] = {'last': ticker['last']}
                 else:
-                    ticker_data = self.fetch_data_from_ccxt(exchange_name, symbol)
-
-                if ticker_data:
-                    data[symbol][exchange_name] = ticker_data
-                    self.logger.info(f"Fetched data for {symbol} on {exchange_name}: {ticker_data}")
+                    logger.warning(f"'last' price not found for {symbol} on {exchange_name}.")
+            except Exception as e:
+                logger.error(f"Error fetching data from {exchange_name} for {symbol}: {e}")
         return data
+
+
+    def fetch_api_key_data(self, exchange_name):
+        api_info = api_keys.get(exchange_name)
+        if not api_info:
+            logger.error(f"No API key/secret found for {exchange_name}.")
+            return {}
+
+        exchange_class = getattr(ccxt, exchange_name)
+        exchange = exchange_class({'apiKey': api_info['api_key'], 'secret': api_info['secret']})
+        data = {}
+        for symbol in self.symbols:
+            try:
+                ticker = exchange.fetch_ticker(symbol)
+                if 'last' in ticker:
+                    data[symbol] = {'last': ticker['last']}
+                else:
+                    logger.warning(f"'last' price not found for {symbol} on {exchange_name}.")
+            except Exception as e:
+                logger.error(f"Error fetching data from {exchange_name} with API key for {symbol}: {e}")
+        return data
+
+    def fetch_public_api_data(self, exchange_name, url):
+        data = {}
+        for symbol in self.symbols:
+            try:
+                response = requests.get(url, params={'symbol': symbol.replace('/', '')})
+                ticker = response.json()
+                if 'last' in ticker:
+                    data[symbol] = {'last': ticker['last']}
+                else:
+                    logger.warning(f"'last' price not found for {symbol} on {exchange_name} public API.")
+            except Exception as e:
+                logger.error(f"Error fetching data from {exchange_name} public API for {symbol}: {e}")
+        return data
+
+    def fetch_data(self):
+        all_data = {}
+        for exchange in self.exchanges:
+            logger.info(f"Fetching data from {exchange} using CCXT.")
+            data = self.fetch_ccxt_data(exchange)
+            if not data:
+                logger.info(f"Fetching data from {exchange} using API keys.")
+                data = self.fetch_api_key_data(exchange)
+            if not data and exchange in self.public_api_urls:
+                logger.info(f"Fetching data from {exchange} using public API URL.")
+                data = self.fetch_public_api_data(exchange, self.public_api_urls[exchange])
+            if data:
+                # Log the fetched data for inspection
+                logger.info(f"Fetched data from {exchange}: {data}")
+                all_data[exchange] = data
+            else:
+                logger.warning(f"No data fetched from {exchange} using any method.")
+        return all_data
