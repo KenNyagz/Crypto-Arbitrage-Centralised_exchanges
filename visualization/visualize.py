@@ -115,7 +115,7 @@ def plot_data(db_name):
 
     while True:
         update_table()
-        time.sleep(120)
+        time.sleep(360)
 
 if __name__ == '__main__':
     plot_data('arbitrage.db')

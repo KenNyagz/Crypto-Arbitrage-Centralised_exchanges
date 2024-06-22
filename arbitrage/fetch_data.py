@@ -1,6 +1,7 @@
 import ccxt
 import logging
 import requests
+import os
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -23,6 +24,7 @@ class DataFetcher:
         self.public_api_urls = public_api_urls
 
     def fetch_ccxt_data(self, exchange_name):
+        """Fetches ticker data using the CCXT library."""
         try:
             exchange_class = getattr(ccxt, exchange_name)
         except AttributeError:
@@ -42,15 +44,17 @@ class DataFetcher:
                 logger.error(f"Error fetching data from {exchange_name} for {symbol}: {e}")
         return data
 
-
     def fetch_api_key_data(self, exchange_name):
-        api_info = api_keys.get(exchange_name)
-        if not api_info:
+        """Fetches ticker data using API keys and secrets from environment variables."""
+        api_key = os.getenv(f'{exchange_name.upper()}_API_KEY')
+        secret = os.getenv(f'{exchange_name.upper()}_SECRET')
+        
+        if not api_key or not secret:
             logger.error(f"No API key/secret found for {exchange_name}.")
             return {}
 
         exchange_class = getattr(ccxt, exchange_name)
-        exchange = exchange_class({'apiKey': api_info['api_key'], 'secret': api_info['secret']})
+        exchange = exchange_class({'apiKey': api_key, 'secret': secret})
         data = {}
         for symbol in self.symbols:
             try:
@@ -64,6 +68,7 @@ class DataFetcher:
         return data
 
     def fetch_public_api_data(self, exchange_name, url):
+        """Fetches ticker data from public API endpoints."""
         data = {}
         for symbol in self.symbols:
             try:
@@ -78,6 +83,7 @@ class DataFetcher:
         return data
 
     def fetch_data(self):
+        """Fetches ticker data from various exchanges using different methods."""
         all_data = {}
         for exchange in self.exchanges:
             logger.info(f"Fetching data from {exchange} using CCXT.")
