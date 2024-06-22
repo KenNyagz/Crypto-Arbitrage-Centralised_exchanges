@@ -1,7 +1,10 @@
 import ccxt
 import logging
 import requests
-from keys.api_keys import api_keys
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Set up logging
 logger = logging.getLogger('fetch_data')
