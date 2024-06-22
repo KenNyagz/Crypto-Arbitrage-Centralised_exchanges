@@ -5,7 +5,7 @@ import concurrent.futures
 from arbitrage.fetch_data import DataFetcher
 from arbitrage.calculate_arbitrage import ArbitrageCalculator
 from arbitrage.log_data import DatabaseLogger
-from visualization.visualize import plot_opportunities
+from visualization.visualize import plot_data
 
 # Configure logging to display info messages with timestamps
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -20,21 +20,25 @@ def fetch_data_task(data_fetcher):
     logger.info("Market data fetched successfully.")
     return data
 
-def calculate_arbitrage_task(data, arbitrage_calculator):
+def calculate_arbitrage_task(data, arbitrage_calculator, db_logger):
     """
-    Calculate arbitrage opportunities using the provided market data and ArbitrageCalculator instance.
+    Calculate arbitrage opportunities using the provided market data and ArbitrageCalculator instance,
+    then log the results using DatabaseLogger.
     """
     logger.info("Calculating arbitrage opportunities.")
     executable_opportunities, outliers = arbitrage_calculator.calculate_arbitrage(data)
     logger.info("Arbitrage opportunities calculated successfully.")
-    return executable_opportunities, outliers
 
-def visualize_task():
-    """
-    Visualize the arbitrage opportunities stored in the database.
-    """
-    logger.info("Visualizing arbitrage opportunities.")
-    plot_opportunities('arbitrage.db')
+    # Log opportunities and outliers
+    for opportunity in executable_opportunities:
+        db_logger.log_opportunity(opportunity)
+        logger.info(f"Arbitrage opportunity logged successfully: {opportunity}")
+
+    for outlier in outliers:
+        db_logger.log_outlier(outlier)
+        logger.info(f"Outlier logged successfully: {outlier}")
+
+    return executable_opportunities, outliers
 
 def main():
     while True:
@@ -66,9 +70,10 @@ def main():
 
         logger.info("Initializing database logger.")
         db_logger = DatabaseLogger('arbitrage.db')
+        db_logger._create_tables()  # Ensure tables are created
 
         logger.info("Initializing arbitrage calculator.")
-        arbitrage_calculator = ArbitrageCalculator(db_logger)
+        arbitrage_calculator = ArbitrageCalculator(db_logger)  # Pass db_logger instance here
 
         # Use ThreadPoolExecutor to fetch data and calculate arbitrage concurrently
         with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -77,7 +82,7 @@ def main():
             data = future_data.result()
 
             # Submit calculate arbitrage task to the executor
-            future_arbitrage = executor.submit(calculate_arbitrage_task, data, arbitrage_calculator)
+            future_arbitrage = executor.submit(calculate_arbitrage_task, data, arbitrage_calculator, db_logger)
             executable_opportunities, outliers = future_arbitrage.result()
 
         # Log results
@@ -90,7 +95,8 @@ def main():
             logger.info(outlier)
 
         # Visualize opportunities
-        visualize_task()
+        logger.info("Visualizing arbitrage opportunities.")
+        plot_data('arbitrage.db')
 
         # Close database connection
         logger.info("Closing database connection.")
