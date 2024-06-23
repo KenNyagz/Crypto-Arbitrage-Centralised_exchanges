@@ -10,6 +10,7 @@ load_dotenv()
 # Set up logging
 logger = logging.getLogger('fetch_data')
 logger.setLevel(logging.INFO)
+
 if not logger.handlers:
     ch = logging.StreamHandler()
     ch.setLevel(logging.INFO)
