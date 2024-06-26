@@ -1,21 +1,19 @@
-    public_api_urls = {
-        'binance': 'https://api.binance.com/api/v3/ticker/price',
-        'kraken': 'https://api.kraken.com/0/public/Ticker',
-        'coinbase_pro': 'https://api.pro.coinbase.com/products/ticker',
-        'cryptocompare': 'https://min-api.cryptocompare.com/data/pricemultifull',  # CryptoCompare (multi-currency)
-        'coinmarketcap': 'https://api.coinmarketcap.com/v1/ticker/',  # CoinMarketCap
-
-        # Additional exchange specific APIs
-        'huobi': 'https://api.huobi.com/market/tickers',
-        'gateio': 'https://api.gateio.ws/api/v4/spot/tickers',
-        'bitfinex': 'https://docs.bitfinex.com/reference/v2/tickers (refer to docs for specific endpoint)',  # Replace with specific endpoint URL
-        'bittrex': 'https://international.bittrex.com/api/v1.1/public/getmarketsummaries (refer to docs for specific endpoint)',  # Replace with specific endpoint URL
-        'poloniex': 'https://api-docs.poloniex.com/ (refer to docs for public data access)',  # Check docs for limitations
-        'kucoin': 'https://api.kucoin.com/api/v1/market/tickers',
-
-        # Aggregator APIs
-        'coingecko': 'https://api.coingecko.com/api/v3/coins/markets',  # Replace with specific endpoint URL (refer to docs)
-       # 'nomics': 'https://api.nomics.com/v1/currencies/ticker?key=YOUR_NOMICS_API_KEY',  # Requires API key
-}
-
-# Remember to replace placeholders with your own API keys if needed
+# Define the exchanges and symbols to fetch data for
+        exchanges = ['binance', 'kraken', 'htx', 'coinbase', 'bitfinex', 'gemini', 'bittrex', 'bybit', 'huobi']
+        symbols = [
+            'ETH/USD', 'BTC/USD', 'USDT/USD', 'BNB/USDT', 'ADA/USD', 'XRP/USD',
+            'LTC/USD', 'SOL/USD', 'DOT/USD', 'LINK/USD', 'USDC/USD'
+        ]
+        public_api_urls = {
+            'binance': 'https://api.binance.com/api/v3/ticker/price',
+            'kraken': 'https://api.kraken.com/0/public/Ticker',
+            'coinbase_pro': 'https://api.pro.coinbase.com/products/ticker',
+            'cryptocompare': 'https://min-api.cryptocompare.com/data/pricemultifull',
+            'coinmarketcap': 'https://api.coinmarketcap.com/v1/ticker/',
+            'huobi': 'https://api.huobi.com/market/tickers',
+            'gateio': 'https://api.gateio.ws/api/v4/spot/tickers',
+            'bitfinex': 'https://api.bitfinex.com/v2/tickers',
+            'bittrex': 'https://api.bittrex.com/v3/markets/tickers',
+            'poloniex': 'https://poloniex.com/public?command=returnTicker',
+            'kucoin': 'https://api.kucoin.com/api/v1/market/tickers'
+        }
