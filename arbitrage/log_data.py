@@ -1,5 +1,3 @@
-# log_data.py
-
 import sqlite3
 import threading
 import logging
@@ -34,24 +32,42 @@ class ArbitrageOpportunity:
 
 class DatabaseLogger:
     def __init__(self, db_name):
+        """
+        Initialize the DatabaseLogger with the database name.
+        Ensure tables are created on initialization.
+        """
         self.db_name = db_name
         self._local = threading.local()
-        self._create_tables()  # Ensure tables are created on initialization
+        self._create_tables()
 
     def _get_connection(self):
+        """
+        Get a database connection for the current thread.
+        Create a new connection if it does not exist.
+        """
         if not hasattr(self._local, "connection"):
             self._local.connection = sqlite3.connect(self.db_name)
         return self._local.connection
 
     def _get_cursor(self):
+        """
+        Get a cursor for the current thread's database connection.
+        Create a new cursor if it does not exist.
+        """
         if not hasattr(self._local, "cursor"):
             self._local.cursor = self._get_connection().cursor()
         return self._local.cursor
 
     def _commit(self):
+        """
+        Commit the current transaction.
+        """
         self._get_connection().commit()
 
     def _close(self):
+        """
+        Close the cursor and connection for the current thread.
+        """
         if hasattr(self._local, "cursor"):
             self._local.cursor.close()
             del self._local.cursor
@@ -60,6 +76,10 @@ class DatabaseLogger:
             del self._local.connection
 
     def _create_tables(self):
+        """
+        Create necessary tables in the database.
+        Drops the 'balances' table if it exists to ensure the correct schema.
+        """
         cursor = self._get_cursor()
 
         # Drop the balances table if it exists to ensure the correct schema
@@ -113,8 +133,6 @@ class DatabaseLogger:
                             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)''')
 
         self._commit()
-        
-        
 
     def log_ticker(self, exchange, symbol, price_usd):
         """
@@ -194,7 +212,9 @@ class DatabaseLogger:
 
         Parameters:
         exchange (str): The exchange name.
-        balances (dict): A dictionary of balances with currency as key and balance details as value.
+        currency (str): The currency.
+        free (float): The free balance amount.
+        locked (float): The locked balance amount, default is 0.
         """
         cursor = self._get_cursor()
         try:

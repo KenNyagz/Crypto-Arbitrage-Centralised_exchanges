@@ -21,7 +21,7 @@ class WalletManager:
     def __init__(self):
         self.exchanges = {}  # Dictionary to hold exchange instances
         self.last_access_time = {}  # Dictionary to track the last access time of each exchange
-        self.db_logger = DatabaseLogger('arbitrage_opportunities.db')  # Initialize the DatabaseLogger
+        self.db_logger = DatabaseLogger('arbitrage.db')  # Initialize the DatabaseLogger
         self.db_logger._create_tables()  # Ensure the tables are created
         self.load_api_keys()  # Load API keys and initialize exchanges
 
