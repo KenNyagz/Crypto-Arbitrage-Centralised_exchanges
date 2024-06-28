@@ -71,13 +71,13 @@ def get_arbtg(exchange1, exchange2, exchange1_tickers, exchange2_tickers):
 
     return result
 
-#print('\n Binance and Bybit\n',get_arbtg('binance', 'bybit', binance_tickers, bybit_tickers))
-#print('\n Binance and Huobi\n', get_arbtg('binance', 'huobi', binance_tickers, huobi_tickers))
-#print('\n Binance and OKX\n', get_arbtg('binance', 'okx', binance_tickers, okx_tickers))
-#print('\n Binance and gateio\n',get_arbtg('binance', 'gateio', binance_tickers, gateio_tickers))
+print('\n Binance and Bybit\n',get_arbtg('binance', 'bybit', binance_tickers, bybit_tickers))
+print('\n Binance and Huobi\n', get_arbtg('binance', 'huobi', binance_tickers, huobi_tickers))
+print('\n Binance and OKX\n', get_arbtg('binance', 'okx', binance_tickers, okx_tickers))
+print('\n Binance and gateio\n',get_arbtg('binance', 'gateio', binance_tickers, gateio_tickers))
 print('\n Bybit and Huobi\n', get_arbtg('bybit', 'huobi', bybit_tickers, huobi_tickers))
 print('\n Bybit and OKX\n', get_arbtg('bybit', 'okx', bybit_tickers, okx_tickers,))
 print('\n Bybit and Gateio\n',get_arbtg('bybit', 'gateio', bybit_tickers, gateio_tickers))
-#print('\n Huobi and OKX\n', get_arbtg('huobi', 'okx', huobi_tickers, okx_tickers))
-#print('\n Huobi and GateIO\n', get_arbtg('huobi', 'gateio', huobi_tickers, gateio_tickers))
-#print('\n OKX and GateIO\n', get_arbtg('okx', 'gateio', okx_tickers, gateio_tickers))
+print('\n Huobi and OKX\n', get_arbtg('huobi', 'okx', huobi_tickers, okx_tickers))
+print('\n Huobi and GateIO\n', get_arbtg('huobi', 'gateio', huobi_tickers, gateio_tickers))
+print('\n OKX and GateIO\n', get_arbtg('okx', 'gateio', okx_tickers, gateio_tickers))
