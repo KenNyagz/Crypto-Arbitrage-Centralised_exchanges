@@ -2,13 +2,6 @@ import requests
 
 
 def get_tickers(okx_secret=None):
-    if okx_secret == None:
-        with open('api_secret', 'r') as f:
-            secret = f.read()
-    else:
-        secret = okx_secret
-    public_key = ''    
-
     url = 'https://api.bybit.com/v5/market/tickers?category=spot'
     response = requests.get(url)
     data = response.json()
