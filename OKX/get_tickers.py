@@ -2,12 +2,12 @@ import requests
 
 
 def get_tickers(okx_secret=None):
-    if okx_secret == None:
-        with open('api_secret', 'r') as f:
-            secret = f.read()
-    else:
-        secret = okx_secret
-    public_key = '6114f3f9-1c11-47b4-ba6a-7bf5dca15972'    
+    # if okx_secret == None:
+        # with open('api_secret', 'r') as f:
+           # secret = f.read()
+    #else:
+        #secret = okx_secret
+    #public_key = '6114f3f9-1c11-47b4-ba6a-7bf5dca15972'    
 
     url = 'https://www.okx.com/api/v5/market/tickers?instType=SPOT'
     response = requests.get(url)
