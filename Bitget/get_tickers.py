@@ -13,7 +13,7 @@ def get_tickers(okx_secret=None):
         pairs_prices.update({pair: float(price)})
 
     #for pair in pairs_prices:
-    #    print(pair, ':', pairs_prices[pair]) # visualisation
+    #    print(pair, ':', pairs_prices[pair]) # visualisation len~=958
     return pairs_prices
 
 
