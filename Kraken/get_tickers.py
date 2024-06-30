@@ -16,7 +16,7 @@ def get_tickers():
         for _ in data[i]:
             pair = i
             price = data[i]['c'][0]
-            pairs_prices.update({pair.upper(): price}) #Uppercase for uniformity
+            pairs_prices.update({pair.upper(): price}) # Uppercase for uniformity
 
     #for pair in pairs_prices:
     #    print(pair + " : " + str(pairs_prices[pair])) #Viz *len~809
