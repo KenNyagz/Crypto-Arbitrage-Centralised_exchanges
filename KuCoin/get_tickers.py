@@ -1,5 +1,4 @@
 import requests
-import json
 
 
 def get_tickers():
@@ -15,7 +14,7 @@ def get_tickers():
     for i in data['ticker']:
         for key in i:
             pair = i['symbol'].replace('-', '')
-            price = i['last']
+            price = float(i['last'])
             pairs_prices.update({pair.upper(): price}) #Uppercase for uniformity
 
     #for pair in pairs_prices:

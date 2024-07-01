@@ -15,11 +15,11 @@ def get_tickers():
     for i in data:
         for key in i:
             pair = i['s']
-            price = i['p']
+            price = float(i['p'])
             pairs_prices.update({pair.upper(): price}) #Uppercase for uniformity
 
-    for pair in pairs_prices:
-        print(pair + " : " + str(pairs_prices[pair]))
+    #for pair in pairs_prices:
+    #    print(pair + " : " + str(pairs_prices[pair]))  #len~1319
 
     return pairs_prices
 

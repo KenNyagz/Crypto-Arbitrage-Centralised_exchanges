@@ -12,7 +12,7 @@ def get_tickers(okx_secret=None):
     pairs_prices = {}
     for i in data:
         pair = i['symbol']
-        price = i['lastPrice']
+        price = float(i['lastPrice'])
         pairs_prices.update({pair: float(price)})
 
     #for pair in pairs_prices:

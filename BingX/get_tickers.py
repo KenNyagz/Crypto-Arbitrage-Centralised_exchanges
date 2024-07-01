@@ -19,7 +19,7 @@ def get_tickers():
     pairs_prices = {}
     for i in pairs:
         pair = i['symbol']
-        price = i['trades']['price']
+        price = float(i['trades']['price'])
         pairs_prices.update({pair.upper(): price}) #Uppercase for uniformity
 
     for pair in pairs_prices:
